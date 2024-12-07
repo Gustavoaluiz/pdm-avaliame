@@ -52,10 +52,21 @@ class Maps_Scraper:
     def get_data(self):
         print('get data...')
         all_dicts = []
+        restaurant_name = self.driver.find_element(By.XPATH, '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/div[1]/h1').text
 
         # Clicar para mostrar as avaliações
-        elemento = self.driver.find_element(By.XPATH, "//div[@class='Gpq6kf fontTitleSmall' and text()='Avaliações']")
-        elemento.click()
+        avaliacoes = self.driver.find_element(By.XPATH, "//div[@class='Gpq6kf fontTitleSmall' and text()='Avaliações']")
+        avaliacoes.click()
+        time.sleep(1)
+
+        # Ordenar por mais recentes
+        sort = self.driver.find_element(By.XPATH, '//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[7]/div[2]/button/span/span[2]')
+        sort.click()
+        time.sleep(1)
+
+        recents = self.driver.find_element(By.XPATH, '//*[@id="action-menu"]/div[2]')
+        recents.click()
+        time.sleep(2)
 
         # Scrollar para carregar todos os comentários
         self.scrolling()
@@ -64,6 +75,7 @@ class Maps_Scraper:
         for element in more_elements:
             element.click()
 
+        time.sleep(2)
         html = self.driver.page_source
         soup = BeautifulSoup(html, 'html.parser')  
 
@@ -72,7 +84,9 @@ class Maps_Scraper:
 
         for comment in comments: 
             comment_dict = {}
-            comment_dict['text'] = comment.find('span', class_='wiI7pd').text
+            comment_dict['restaurant'] = restaurant_name
+            text = comment.find('span', class_='wiI7pd')
+            comment_dict['text'] = text.text if text else None
             comment_dict['score'] = comment.find('span', class_='kvMYJc').get('aria-label')
             comment_dict['name'] = comment.find('div', class_='d4r55').text
             comment_dict['relative_date'] = comment.find('span', class_='rsqaWe').text 
@@ -95,11 +109,11 @@ class Maps_Scraper:
         
     def counter(self):
         result_text = self.driver.find_element(By.CLASS_NAME, 'jANrlb').find_element(By.CLASS_NAME, 'fontBodySmall').text
-        result_number = int(result_text.split(' ')[0].replace(',', ''))
+        result_number = int(result_text.split(' ')[0].replace('.', ''))
         return result_number
 
     def scrolling(self):
-        total_reviews = 340
+        total_reviews = self.counter()
         n_reviews = 0
 
         container = self.driver.find_element(By.XPATH, "//*[@id='QA0Szd']/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]")
@@ -124,7 +138,7 @@ class Maps_Scraper:
 if __name__ == "__main__":
     URL = \
     """
-    https://www.google.com/maps/place/Bianco+Ristorante/data=!4m7!3m6!1s0x935efb0c9f1c4f21:0xfac8d868d02056ae!8m2!3d-16.6967677!4d-49.2603075!16s%2Fg%2F11rwp80b4c!19sChIJIU8cnwz7XpMRrlYg0GjYyPo?authuser=0&hl=pt-BR&rclk=1
+    https://www.google.com/maps/place/Pobre+Juan+-+Goi%C3%A2nia/data=!4m7!3m6!1s0x935ef053cbc5fcad:0xab836dc615973623!8m2!3d-16.7115803!4d-49.2362648!16s%2Fg%2F11c30tvx7p!19sChIJrfzFy1PwXpMRIzaXFcZtg6s?authuser=0&hl=pt-BR&rclk=1
     """
     
     scraper = Maps_Scraper(url=URL)
