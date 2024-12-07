@@ -3,3 +3,7 @@
 
 # Fluxograma
 ![1733485885935](image/README/1733485885935.jpg)
+
+
+# ChromeDriver e Chrome:
+https://googlechromelabs.github.io/chrome-for-testing/#stable
