@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,9 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import pyautogui as pa
 from selenium.common.exceptions import NoSuchElementException
+import os
 
-
-URL = 'https://www.google.com.br/maps/place/Centro+Sul+Portas+e+Janelas/@-16.6491979,-49.3153822,12z/data=!4m12!1m2!2m1!1scentro+sul+portas+e+janelas!3m8!1s0x935eee742cb52c89:0x13e9c27dedb272f9!8m2!3d-16.6595777!4d-49.1765358!9m1!1b1!15sChtjZW50cm8gc3VsIHBvcnRhcyBlIGphbmVsYXOSAQ1kb29yX3N1cHBsaWVy4AEA!16s%2Fg%2F11cmr56f7c?entry=ttu'
 
 def get_data(driver):
     print('get data...')
@@ -126,11 +125,22 @@ def write_to_xlsx(data):
     df.to_excel('out.xlsx')
 
 if __name__ == "__main__":
+    chrome_path = os.getenv('CHROME_PATH')
+    chromedriver_path = os.getenv('CHROMEDRIVER_PATH')
+
+    # Incializar driver selenium
+    chrome_options = Options()
+    chrome_options.binary_location = chrome_path
+    service = Service(executable_path=chromedriver_path)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.maximize_window()    
+
+    URL = 'https://www.google.com.br/maps/place/Centro+Sul+Portas+e+Janelas/@-16.6491979,-49.3153822,12z/data=!4m12!1m2!2m1!1scentro+sul+portas+e+janelas!3m8!1s0x935eee742cb52c89:0x13e9c27dedb272f9!8m2!3d-16.6595777!4d-49.1765358!9m1!1b1!15sChtjZW50cm8gc3VsIHBvcnRhcyBlIGphbmVsYXOSAQ1kb29yX3N1cHBsaWVy4AEA!16s%2Fg%2F11cmr56f7c?entry=ttu'
+
     print('starting...')
-    options = Options()
-    options.add_argument("--lang=en-US")
-    options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    # options = Options()
+    # options.add_argument("--lang=en-US")
+    # options.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_US'})
     
     driver.get(URL)
     time.sleep(10)
